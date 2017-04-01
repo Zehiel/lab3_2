@@ -102,5 +102,21 @@ public class NewsLoaderTest {
 
     }
 
-   
+    @Test
+    @Ignore //no implementation for subs yet
+    public void prepareForPublish_checkIPublicAndSubNewsAreAddedToPublishable_onePublicAndOneSubNews() throws Exception {
+        IncomingNews incomingNews = new IncomingNews();
+        incomingNews.add(new IncomingInfo("bla bla",SubsciptionType.NONE));
+        incomingNews.add(new IncomingInfo("bla bla bla",SubsciptionType.A));
+        when(webServiceNewsReader.read()).thenReturn(incomingNews);
+        NewsLoader newsLoader = new NewsLoader();
+        spyPublishableNews = newsLoader.loadNews();
+        List<String> result1 = (List<String>)Whitebox.getInternalState(spyPublishableNews,"publicContent");
+        List<String> result2 = (List<String>)Whitebox.getInternalState(spyPublishableNews,"subscribentContent");
+        assertThat(result1.size(),is(equalTo(1)));
+        assertThat(result2.size(),is(equalTo(1)));
+        assertThat(result1.get(0),is(equalTo("bla bla")));
+        assertThat(result2.get(0),is(equalTo("bla bla bla")));
+
+    }
 }
