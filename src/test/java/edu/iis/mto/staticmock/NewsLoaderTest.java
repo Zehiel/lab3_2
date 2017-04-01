@@ -91,5 +91,16 @@ public class NewsLoaderTest {
 
     }
 
+    @Test
+    public void prepareForPublish_checkIfAddPSubContentHasBeenCalledOneTime_oneSubNews() throws Exception {
+        IncomingNews incomingNews = new IncomingNews();
+        incomingNews.add(new IncomingInfo("bla bla",SubsciptionType.A));
+        when(webServiceNewsReader.read()).thenReturn(incomingNews);
+        NewsLoader newsLoader = new NewsLoader();
+        spyPublishableNews = newsLoader.loadNews();
+        Mockito.verify(spyPublishableNews,times(1)).addForSubscription("bla bla",SubsciptionType.A);
+
+    }
+
    
 }
