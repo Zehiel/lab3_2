@@ -4,6 +4,7 @@ import edu.iis.mto.staticmock.reader.WebServiceNewsReader;
 import jdk.nashorn.internal.runtime.regexp.joni.Config;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
@@ -75,4 +76,20 @@ public class NewsLoaderTest {
         Mockito.verify(spyPublishableNews,times(1)).addPublicInfo("bla bla");
 
     }
+
+    @Test
+    @Ignore //Not implemented yet
+    public void prepareForPublish_checkISubNewsAreAddedToPublishable_oneSubNews() throws Exception {
+        IncomingNews incomingNews = new IncomingNews();
+        incomingNews.add(new IncomingInfo("bla bla",SubsciptionType.A));
+        when(webServiceNewsReader.read()).thenReturn(incomingNews);
+        NewsLoader newsLoader = new NewsLoader();
+        spyPublishableNews = newsLoader.loadNews();
+        List<String> result = (List<String>)Whitebox.getInternalState(spyPublishableNews,"subscribentContent");
+        assertThat(result.size(),is(equalTo(1)));
+        assertThat(result.get(0),is(equalTo("bla bla")));
+
+    }
+
+   
 }
