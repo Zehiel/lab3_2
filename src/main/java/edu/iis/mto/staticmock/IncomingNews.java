@@ -5,13 +5,13 @@ import java.util.List;
 
 public class IncomingNews {
 
-	private List<IncomingInfo> elems = new ArrayList<>(10);
+    private List<IncomingInfo> elems = new ArrayList<>(10);
 
-	public List<IncomingInfo> elems() {
-		return elems;
-	}
+    public List<IncomingInfo> elems() {
+        return elems;
+    }
 
-	public void add(IncomingInfo info) {
-		elems.add(info);
-	}
+    public void add(IncomingInfo info) {
+        elems.add(info);
+    }
 }

@@ -4,6 +4,6 @@ import edu.iis.mto.staticmock.IncomingNews;
 
 public interface NewsReader {
 
-	IncomingNews read();
+    IncomingNews read();
 
 }
