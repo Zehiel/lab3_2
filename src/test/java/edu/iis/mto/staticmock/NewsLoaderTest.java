@@ -6,6 +6,7 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Mockito;
 import org.mockito.internal.util.reflection.Whitebox;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
@@ -16,7 +17,7 @@ import java.util.List;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 import static org.mockito.internal.util.reflection.Whitebox.getInternalState;
 import static org.powermock.api.mockito.PowerMockito.mock;
 import static org.powermock.api.mockito.PowerMockito.mockStatic;
@@ -27,10 +28,11 @@ import static org.powermock.api.mockito.PowerMockito.mockStatic;
  */
 
 @RunWith(PowerMockRunner.class)
-@PrepareForTest ({ConfigurationLoader.class,NewsReaderFactory.class})
+@PrepareForTest ({ConfigurationLoader.class,NewsReaderFactory.class,PublishableNews.class})
 public class NewsLoaderTest {
 
     private WebServiceNewsReader webServiceNewsReader;
+    private PublishableNews spyPublishableNews;
 
     @Before
     public void setUp() throws Exception {
@@ -45,21 +47,32 @@ public class NewsLoaderTest {
         mockStatic(NewsReaderFactory.class);
         NewsReaderFactory newsReaderFactory = mock(NewsReaderFactory.class);
         when(NewsReaderFactory.getReader(configuration.getReaderType())).thenReturn(webServiceNewsReader);
-
-
-
+        mockStatic((PublishableNews.class));
+        spyPublishableNews = spy(new PublishableNews());
+        when(PublishableNews.create()).thenReturn(spyPublishableNews);
     }
 
     @Test
-    public void prepareForPublish_checkIPublicNewsAreAddedToPublishable_oneNews() throws Exception {
+    public void prepareForPublish_checkIPublicNewsAreAddedToPublishable_onePublicNews() throws Exception {
         IncomingNews incomingNews = new IncomingNews();
         incomingNews.add(new IncomingInfo("bla bla",SubsciptionType.NONE));
         when(webServiceNewsReader.read()).thenReturn(incomingNews);
         NewsLoader newsLoader = new NewsLoader();
-        PublishableNews publishableNews = newsLoader.loadNews();
-        List<String> result = (List<String>)Whitebox.getInternalState(publishableNews,"publicContent");
+        spyPublishableNews = newsLoader.loadNews();
+        List<String> result = (List<String>)Whitebox.getInternalState(spyPublishableNews,"publicContent");
         assertThat(result.size(),is(equalTo(1)));
         assertThat(result.get(0),is(equalTo("bla bla")));
+
+    }
+
+    @Test
+    public void prepareForPublish_checkIfAddPublicContentHasBeenCalledOneTime_onePublicNews() throws Exception {
+        IncomingNews incomingNews = new IncomingNews();
+        incomingNews.add(new IncomingInfo("bla bla",SubsciptionType.NONE));
+        when(webServiceNewsReader.read()).thenReturn(incomingNews);
+        NewsLoader newsLoader = new NewsLoader();
+        spyPublishableNews = newsLoader.loadNews();
+        Mockito.verify(spyPublishableNews,times(1)).addPublicInfo("bla bla");
 
     }
 }
