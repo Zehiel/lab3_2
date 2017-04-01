@@ -54,7 +54,7 @@ public class NewsLoaderTest {
     }
 
     @Test
-    public void prepareForPublish_checkIPublicNewsAreAddedToPublishable_onePublicNews() throws Exception {
+    public void prepareForPublish_checkIfPublicNewsAreAddedToPublishable_onePublicNews() throws Exception {
         IncomingNews incomingNews = new IncomingNews();
         incomingNews.add(new IncomingInfo("bla bla",SubsciptionType.NONE));
         when(webServiceNewsReader.read()).thenReturn(incomingNews);
@@ -79,7 +79,7 @@ public class NewsLoaderTest {
 
     @Test
     @Ignore //Not implemented yet
-    public void prepareForPublish_checkISubNewsAreAddedToPublishable_oneSubNews() throws Exception {
+    public void prepareForPublish_checkIfSubNewsAreAddedToPublishable_oneSubNews() throws Exception {
         IncomingNews incomingNews = new IncomingNews();
         incomingNews.add(new IncomingInfo("bla bla",SubsciptionType.A));
         when(webServiceNewsReader.read()).thenReturn(incomingNews);
@@ -104,7 +104,7 @@ public class NewsLoaderTest {
 
     @Test
     @Ignore //no implementation for subs yet
-    public void prepareForPublish_checkIPublicAndSubNewsAreAddedToPublishable_onePublicAndOneSubNews() throws Exception {
+    public void prepareForPublish_checkIfPublicAndSubNewsAreAddedToPublishable_onePublicAndOneSubNews() throws Exception {
         IncomingNews incomingNews = new IncomingNews();
         incomingNews.add(new IncomingInfo("bla bla",SubsciptionType.NONE));
         incomingNews.add(new IncomingInfo("bla bla bla",SubsciptionType.A));
@@ -117,6 +117,19 @@ public class NewsLoaderTest {
         assertThat(result2.size(),is(equalTo(1)));
         assertThat(result1.get(0),is(equalTo("bla bla")));
         assertThat(result2.get(0),is(equalTo("bla bla bla")));
+
+    }
+
+    @Test
+    public void prepareForPublish_checkIfAddPSubContentAndAddPublicContentHasBeenCalledOneTimeEach_onePublicAndSubNews() throws Exception {
+        IncomingNews incomingNews = new IncomingNews();
+        incomingNews.add(new IncomingInfo("bla bla",SubsciptionType.NONE));
+        incomingNews.add(new IncomingInfo("bla bla bla",SubsciptionType.A));
+        when(webServiceNewsReader.read()).thenReturn(incomingNews);
+        NewsLoader newsLoader = new NewsLoader();
+        spyPublishableNews = newsLoader.loadNews();
+        Mockito.verify(spyPublishableNews,times(1)).addPublicInfo("bla bla");
+        Mockito.verify(spyPublishableNews,times(1)).addForSubscription("bla bla bla",SubsciptionType.A);
 
     }
 }
